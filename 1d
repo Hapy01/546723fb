@@ -1,0 +1,92 @@
+function farm()
+
+	local plr = game.Players.LocalPlayer
+	local AcceptEvent = game:GetService("ReplicatedStorage").QuestSystem.Events.AcceptQuest
+
+	local doquestlist = {
+		DeliverOxygen_SouthCamp1 = true,
+		DeliverSupply_EastCamp1 = true,
+		OxygenTransport_Camp3 = true
+	}
+
+	local state = "searching"
+	local activequest = nil
+
+	while true do
+		task.wait(0.5)
+
+		local chr = plr.Character or plr.CharacterAdded:Wait()
+		local hrp = chr:WaitForChild("HumanoidRootPart")
+
+		local questlist = plr.PlayerGui:WaitForChild("QuestGui").arka.List
+		local questgiver = workspace.QUESTGIVER.QuestGiver.ProximityPrompt
+
+		if state == "searching" then
+
+			hrp.CFrame = CFrame.new(11406.1, 3229.2, 624.1)
+			task.wait(1.5)
+			fireproximityprompt(questgiver)
+			task.wait(1)
+			hrp.CFrame = CFrame.new(11406.1, 3229.2, 624.1)
+			task.wait(1.5)
+
+			fireproximityprompt(questgiver)
+			task.wait(1)
+
+			local found = nil
+
+			for _, quest in ipairs(questlist:GetChildren()) do
+				if doquestlist[quest.Name] then
+					found = quest.Name
+					break
+				end
+			end
+
+			if found then
+				activequest = found
+				AcceptEvent:FireServer(activequest)
+
+				state = "doing"
+			end
+
+		elseif state == "doing" then
+
+			for i = 425, 1, -1 do
+				game:GetService("StarterGui"):SetCore("SendNotification", {
+    				Title = "Timer",
+   				    Text = i .. " Seconds",
+  					Duration = 1
+					})
+   			 wait(1)
+			end
+
+			if activequest == "DeliverOxygen_SouthCamp1" then
+				hrp.CFrame = CFrame.new(5651.44, 5811.29, 4590.92)
+				wait(2.5)
+				fireproximityprompt(workspace.QuestDeliveryZones.SouthFaceCamp1_DropOff["Complete Quest"])
+				wait(1)
+				hrp.CFrame = CFrame.new(11406.1, 3229.2, 624.1)
+				wait(60)
+			elseif activequest == "DeliverSupply_EastCamp1" then
+				hrp.CFrame = CFrame.new(7278.66, 6193.23, 1313.52)
+				wait(2.5)
+				fireproximityprompt(workspace.QuestDeliveryZones.EastFaceCamp1_DropOff["Complete Quest"])
+				wait(1)
+				hrp.CFrame = CFrame.new(11406.1, 3229.2, 624.1)
+				wait(60)
+			elseif activequest == "OxygenTransport_Camp3" then
+				hrp.CFrame = CFrame.new(2559.97, 10732.65, -2299.11)
+				wait(2.5)
+				fireproximityprompt(workspace.QuestDeliveryZones.Camp3_Dropoff["Complete Quest"])
+				wait(1)
+				hrp.CFrame = CFrame.new(11406.1, 3229.2, 624.1)
+				wait(60)
+			end
+
+			activequest = nil
+			state = "searching"
+		end
+	end
+end
+
+farm()
